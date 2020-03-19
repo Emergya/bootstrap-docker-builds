@@ -561,7 +561,7 @@ def runJob(job_env) {
 
                 def full_names = []
                 for (def tag in tags)
-                    full_names.add("docker.sunet.se/${job_env.docker_name.replace("-/", "/")}:${tag}") // docker doesn't like glance-/repo, so mangle it to glance/repo
+                    full_names.add("sunet-jenkins.ed-integrations.com:5000/${job_env.docker_name.replace("-/", "/")}:${tag}") // docker doesn't like glance-/repo, so mangle it to glance/repo
 
                 def docker_build_and_publish = [
                     $class: 'DockerBuilderPublisher',
