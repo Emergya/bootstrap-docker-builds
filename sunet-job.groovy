@@ -418,7 +418,9 @@ property_list += [
     $class: 'EnvInjectJobProperty',
     info: [
         propertiesContent: "FULL_NAME=${FULL_NAME}\n" + (env.DEV_MODE != null ? "DEV_MODE=${DEV_MODE}\n" : "") +
-                (env.EMERGYA_ENV != null ? "EMERGYA_ENV=${EMERGYA_ENV}\n" : "")
+                (env.EMERGYA_ENV != null ? "EMERGYA_ENV=${env.EMERGYA_ENV}\n" : "") +
+                (EMERGYA_ENV != null ? "EMERGYA_ENV_2=${EMERGYA_ENV}\n" : "")
+
     ],
     keepBuildVariables: true,
     keepJenkinsSystemVariables: true,
@@ -474,6 +476,27 @@ def runJob(job_env) {
                     args["extensions"].add([$class: 'CloneOption', shallow: true])
                 }
             }
+            if ("${EMERGYA_ENV}" != null) {
+                echo("EMERGYA_ENV found: '${EMERGYA_ENV}'")
+            } else {
+                echo("EMERGYA_ENV not found")
+            }
+            if ("${env.EMERGYA_ENV}" != null) {
+                echo("env.EMERGYA_ENV found: '${env.EMERGYA_ENV}'")
+            } else {
+                echo("env.EMERGYA_ENV not found")
+            }
+            if ("${EMERGYA_ENV_2}" != null) {
+                echo("EMERGYA_ENV_2 found: '${EMERGYA_ENV_2}'")
+            } else {
+                echo("EMERGYA_ENV_2 not found")
+            }
+            if ("${env.EMERGYA_ENV}" != null) {
+                echo("env.EMERGYA_ENV_2 found: '${env.EMERGYA_ENV_2}'")
+            } else {
+                echo("env.EMERGYA_ENV_2 not found")
+            }
+
             if ("${EMERGYA_ENV}" != null) {
                 echo("EMERGYA_ENV found: '${EMERGYA_ENV}'")
                 args["branches"] = []

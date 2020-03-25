@@ -27,6 +27,7 @@ if (binding.hasVariable("EMERGYA_ENV") && "${EMERGYA_ENV}" != "") {
     EMERGYA_ENV = "${EMERGYA_ENV}"
     out.println("EMERGYA_ENV overridden by env: ${EMERGYA_ENV}")
 }
+out.println("EMERGYA_ENV binding.getVariable: ${binding.getVariable("EMERGYA_ENV")}")
 
 for (org in orgs) {
     //TODO: Should we set a per_page=100 (100 is max) to decrese the number of api calls,
