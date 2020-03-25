@@ -22,6 +22,11 @@ if (binding.hasVariable("DEV_MODE") && "${DEV_MODE}" != "" && DEV_MODE.toBoolean
     out.println("DEV_MODE detected, will act accordingly")
     is_dev_mode = true
 }
+def EMERGYA_ENV = null
+if (binding.hasVariable("EMERGYA_ENV") && "${EMERGYA_ENV}" != "") {
+    EMERGYA_ENV = "${EMERGYA_ENV}"
+    out.println("EMERGYA_ENV overridden by env: ${EMERGYA_ENV}")
+}
 
 for (org in orgs) {
     //TODO: Should we set a per_page=100 (100 is max) to decrese the number of api calls,
@@ -101,6 +106,7 @@ for (org in orgs) {
                     environmentVariables {
                         env("FULL_NAME", repo.full_name)
                         env("DEV_MODE", is_dev_mode.toString())
+                        env("EMERGYA_ENV", EMERGYA_ENV)
                     }
                     definition {
                         cps {

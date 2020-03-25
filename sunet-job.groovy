@@ -417,7 +417,8 @@ if (trigger_list)
 property_list += [
     $class: 'EnvInjectJobProperty',
     info: [
-        propertiesContent: "FULL_NAME=${FULL_NAME}\n" + (env.DEV_MODE != null ? "DEV_MODE=${DEV_MODE}\n" : "")
+        propertiesContent: "FULL_NAME=${FULL_NAME}\n" + (env.DEV_MODE != null ? "DEV_MODE=${DEV_MODE}\n" : "") +
+                (env.EMERGYA_ENV != null ? "EMERGYA_ENV=${EMERGYA_ENV}\n" : "")
     ],
     keepBuildVariables: true,
     keepJenkinsSystemVariables: true,
@@ -472,6 +473,19 @@ def runJob(job_env) {
                 if (job_env.git.extensions.shallow_clone != null) {
                     args["extensions"].add([$class: 'CloneOption', shallow: true])
                 }
+            }
+            if ("${EMERGYA_ENV}" != null) {
+                echo("EMERGYA_ENV found: '${EMERGYA_ENV}'")
+                args["branches"] = []
+                if ("${EMERGYA_ENV}" == "pre") {
+                    echo("Using branch master")
+                    args["branches"].add(["name": "*/master"])
+                } else {
+                    echo("Using branch develop")
+                    args["branches"].add(["name": "*/develop"])
+                }
+            } else {
+                echo("EMERGYA_ENV not found")
             }
             scmVars = checkout(args)
             // ['GIT_BRANCH':'origin/master', 'GIT_COMMIT':'8408762af61447e38a832513e595a518d81bf9af', 'GIT_PREVIOUS_COMMIT':'8408762af61447e38a832513e595a518d81bf9af', 'GIT_PREVIOUS_SUCCESSFUL_COMMIT':'dcea3f3567b7f55bc7a1a2f3d6752c084cc9b694', 'GIT_URL':'https://github.com/glance-/docker-goofys.git']
