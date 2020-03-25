@@ -574,8 +574,17 @@ def runJob(job_env) {
                     tags.add("latest")
 
                 def full_names = []
+                if ("${EMERGYA_ENV}" != null) {
+                    if ("${EMERGYA_ENV}" == "pre") {
+                        dockerhub_url = "sunet-jenkins.ed-integrations.com:5000"
+                    } else {
+                        dockerhub_url = "sunet-jenkins-dev.ed-integrations.com:5000"
+                    }
+                } else {
+                    dockerhub_url = "docker.sunet.se"
+                }
                 for (def tag in tags)
-                    full_names.add("sunet-jenkins.ed-integrations.com:5000/${job_env.docker_name.replace("-/", "/")}:${tag}") // docker doesn't like glance-/repo, so mangle it to glance/repo
+                    full_names.add("${dockerhub_url}/${job_env.docker_name.replace("-/", "/")}:${tag}") // docker doesn't like glance-/repo, so mangle it to glance/repo
 
                 def docker_build_and_publish = [
                     $class: 'DockerBuilderPublisher',
