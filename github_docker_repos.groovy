@@ -22,10 +22,15 @@ if (binding.hasVariable("DEV_MODE") && "${DEV_MODE}" != "" && DEV_MODE.toBoolean
     out.println("DEV_MODE detected, will act accordingly")
     is_dev_mode = true
 }
-def EMERGYA_ENV = null
-if (binding.hasVariable("EMERGYA_ENV") && "${EMERGYA_ENV}" != "") {
-    EMERGYA_ENV = "${binding.getVariable('EMERGYA_ENV')}"
-    out.println("EMERGYA_ENV overridden by env: ${EMERGYA_ENV}")
+def DOCKERHUB_URL = null
+if (binding.hasVariable("DOCKERHUB_URL") && "${DOCKERHUB_URL}" != "") {
+    DOCKERHUB_URL = "${binding.getVariable('DOCKERHUB_URL')}"
+    out.println("DOCKERHUB_URL overridden by env: ${DOCKERHUB_URL}")
+}
+def OVERRIDE_BUILD_BRANCHES = null
+if (binding.hasVariable("OVERRIDE_BUILD_BRANCHES") && "${OVERRIDE_BUILD_BRANCHES}" != "") {
+    OVERRIDE_BUILD_BRANCHES = "${binding.getVariable('OVERRIDE_BUILD_BRANCHES')}"
+    out.println("OVERRIDE_BUILD_BRANCHES overridden by env: ${OVERRIDE_BUILD_BRANCHES}")
 }
 
 for (org in orgs) {
@@ -106,7 +111,8 @@ for (org in orgs) {
                     environmentVariables {
                         env("FULL_NAME", repo.full_name)
                         env("DEV_MODE", is_dev_mode.toString())
-                        env("EMERGYA_ENV", EMERGYA_ENV)
+                        env("DOCKERHUB_URL", DOCKERHUB_URL)
+                        env("OVERRIDE_BUILD_BRANCHES", OVERRIDE_BUILD_BRANCHES)
                     }
                     definition {
                         cps {

@@ -417,8 +417,9 @@ if (trigger_list)
 property_list += [
     $class: 'EnvInjectJobProperty',
     info: [
-        propertiesContent: "FULL_NAME=${FULL_NAME}\n" + (env.DEV_MODE != null ? "DEV_MODE=${DEV_MODE}\n" : "") +
-                (env.EMERGYA_ENV != null ? "EMERGYA_ENV=${env.EMERGYA_ENV}\n" : "")
+        propertiesContent: "FULL_NAME=${FULL_NAME}\n" + (env.DEV_MODE != null ? "DEV_MODE=${DEV_MODE}\n" : "")
+                + (env.DOCKERHUB_URL != null ? "DOCKERHUB_URL=${env.DOCKERHUB_URL}\n" : "")
+                + (env.OVERRIDE_BUILD_BRANCHES != null ? "OVERRIDE_BUILD_BRANCHES=${env.OVERRIDE_BUILD_BRANCHES}\n" : "")
 
     ],
     keepBuildVariables: true,
@@ -476,18 +477,12 @@ def runJob(job_env) {
                 }
             }
 
-            if ("${EMERGYA_ENV}" != null) {
-                echo("EMERGYA_ENV found: '${EMERGYA_ENV}'")
+            if ("${OVERRIDE_BUILD_BRANCHES}" != null) {
+                echo("OVERRIDE_BUILD_BRANCHES found: '${OVERRIDE_BUILD_BRANCHES}'")
                 args["branches"] = []
-                if ("${EMERGYA_ENV}" == "pre") {
-                    echo("Using branch master")
-                    args["branches"].add(["name": "*/master"])
-                } else {
-                    echo("Using branch release")
-                    args["branches"].add(["name": "*/release"])
-                }
+                args["branches"].add(["name": "${OVERRIDE_BUILD_BRANCHES}"])
             } else {
-                echo("EMERGYA_ENV not found")
+                echo("OVERRIDE_BUILD_BRANCHES not found")
             }
             scmVars = checkout(args)
             // ['GIT_BRANCH':'origin/master', 'GIT_COMMIT':'8408762af61447e38a832513e595a518d81bf9af', 'GIT_PREVIOUS_COMMIT':'8408762af61447e38a832513e595a518d81bf9af', 'GIT_PREVIOUS_SUCCESSFUL_COMMIT':'dcea3f3567b7f55bc7a1a2f3d6752c084cc9b694', 'GIT_URL':'https://github.com/glance-/docker-goofys.git']
@@ -576,12 +571,8 @@ def runJob(job_env) {
                     tags.add("latest")
 
                 def full_names = []
-                if ("${EMERGYA_ENV}" != null) {
-                    if ("${EMERGYA_ENV}" == "pre") {
-                        dockerhub_url = "sunet-jenkins.ed-integrations.com:5000"
-                    } else {
-                        dockerhub_url = "sunet-jenkins-dev.ed-integrations.com:5000"
-                    }
+                if ("${DOCKERHUB_URL}" != null) {
+                    dockerhub_url="${DOCKERHUB_URL}"
                 } else {
                     dockerhub_url = "docker.sunet.se"
                 }
