@@ -483,8 +483,8 @@ def runJob(job_env) {
                     echo("Using branch master")
                     args["branches"].add(["name": "*/master"])
                 } else {
-                    echo("Using branch develop")
-                    args["branches"].add(["name": "*/develop"])
+                    echo("Using branch release")
+                    args["branches"].add(["name": "*/release"])
                 }
             } else {
                 echo("EMERGYA_ENV not found")
