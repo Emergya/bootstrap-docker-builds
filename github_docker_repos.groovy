@@ -33,6 +33,13 @@ if (binding.hasVariable("OVERRIDE_BUILD_BRANCHES") && "${OVERRIDE_BUILD_BRANCHES
     out.println("OVERRIDE_BUILD_BRANCHES overridden by env: ${OVERRIDE_BUILD_BRANCHES}")
 }
 
+def repos_to_deploy = []
+if (binding.hasVariable("REPOS_TO_DEPLOY") && "${REPOS_TO_DEPLOY}" != "") {
+    def repos_to_deploy_string = "${binding.getVariable('REPOS_TO_DEPLOY')}"
+    repos_to_deploy = repos_to_deploy_string.split(',')
+    out.println("REPOS_TO_DEPLOY overridden by env: ${repos_to_deploy}")
+}
+
 for (org in orgs) {
     //TODO: Should we set a per_page=100 (100 is max) to decrese the number of api calls,
     // So we don't get ratelimited as easy?
@@ -118,6 +125,49 @@ for (org in orgs) {
                         cps {
                             script(readFileFromWorkspace('sunet-job.groovy'))
                             sandbox()
+                        }
+                    }
+                }
+
+                // Config webhook if repo should have it
+                if ( repos_to_deploy.contains(repo.name) ){
+                    // If repository contains 'docker-', webhook can be triggered from repositories 'docker-x' and 'x'
+                    def repo_basic_name = repo.name.replace("docker-","")
+
+                    def valid_branches = []
+
+                    // Run the pipeline only if it is a valid branch
+                    if (OVERRIDE_BUILD_BRANCHES != null && OVERRIDE_BUILD_BRANCHES != ""){
+                        valid_branches += OVERRIDE_BUILD_BRANCHES
+                    } else {
+                        // TODO We should handle there the repo .yaml to view valid branches
+                        // Else, we should try to move this to sunet-job logic
+                    }
+                    pipeline_job.with {
+                        triggers {
+                            genericTrigger {
+                                genericVariables {
+                                    genericVariable {
+                                        key("webhook_repository")
+                                        value("\$.repository.name")
+                                        regexpFilter("^(docker\\-)")
+                                    }
+                                    genericVariable {
+                                        key("webhook_pr_base_branch")
+                                        value("\$.pull_request.base.ref")
+                                    }
+                                    genericVariable {
+                                        key("webhook_action")
+                                        value("\$.action")
+                                    }
+                                    genericVariable {
+                                        key("webhook_pr_merged")
+                                        value("\$.pull_request.merged")
+                                    }
+                                }
+                                regexpFilterText("\$webhook_repository-\$webhook_pr_base_branch-\$webhook_action-\$webhook_pr_merged")
+                                regexpFilterExpression("^(${repo_basic_name})-(${valid_branches.join('|')})-(closed)-(true)\$")
+                            }
                         }
                     }
                 }
