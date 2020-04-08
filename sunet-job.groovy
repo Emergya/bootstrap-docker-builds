@@ -112,7 +112,7 @@ def load_env() {
                 'git'                    : [:],
                 'environment_variables'  : [:],
                 'python_source_directory': 'src',
-                'slack'                  : ['room': 'norduni-notificaciones', 'disabled': false],
+                'slack'                  : ['room': env.SLACK_ROOM, 'disabled': false],
                 'triggers'               : [:],
                 'builders'               : [],
                 'docker_name'            : FULL_NAME.toLowerCase(),

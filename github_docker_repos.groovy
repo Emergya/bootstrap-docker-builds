@@ -32,6 +32,11 @@ if (binding.hasVariable("OVERRIDE_BUILD_BRANCHES") && "${OVERRIDE_BUILD_BRANCHES
     OVERRIDE_BUILD_BRANCHES = "${binding.getVariable('OVERRIDE_BUILD_BRANCHES')}"
     out.println("OVERRIDE_BUILD_BRANCHES overridden by env: ${OVERRIDE_BUILD_BRANCHES}")
 }
+def SLACK_ROOM = null
+if (binding.hasVariable("SLACK_ROOM") && "${SLACK_ROOM}" != "") {
+    SLACK_ROOM = "${binding.getVariable('SLACK_ROOM')}"
+    out.println("SLACK_ROOM overridden by env: ${SLACK_ROOM}")
+}
 
 def repos_to_deploy = []
 if (binding.hasVariable("REPOS_TO_DEPLOY") && "${REPOS_TO_DEPLOY}" != "") {
@@ -120,6 +125,7 @@ for (org in orgs) {
                         env("DEV_MODE", is_dev_mode.toString())
                         env("DOCKERHUB_URL", DOCKERHUB_URL)
                         env("OVERRIDE_BUILD_BRANCHES", OVERRIDE_BUILD_BRANCHES)
+                        env("SLACK_ROOM", SLACK_ROOM)
                     }
                     definition {
                         cps {
